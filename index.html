@@ -18,8 +18,8 @@
         }
         #aviso {
             position: absolute;
-            top: 7%;
-            left: 21%;
+            top: 11%;
+            left: 16%;
             transform: translate(-50%, -50%);
             z-index: 1000; /* Certifique-se de que o menu esteja na frente do mapa */
             background-color: rgba(255, 255, 255, 0.752);
@@ -39,7 +39,7 @@
         <title>Consulta de setores - Xanxere</title>
         <link rel="shortcut icon" type="image/jpg" href="icon.ico"/>    </head>
     <body>
-        <div id="aviso">1 - Selecione a operação que deseja <br>2 - Pesquise por Rua, N° e Cidade<br>3 - Clique na linha sobre a rua, no local mais próximo à sua pesquisa</div>
+        <div id="aviso">1 - Pesquise por Rua, N° e Cidade<br>2 - Clique na linha sobre a rua, no local mais próximo à sua pesquisa</div>
         <div id="map"></div>
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -54,7 +54,7 @@
         <script src="data/DOMXANXERE_1.js"></script>
         <script>
         var map = L.map('map', {
-            zoomControl:true, maxZoom:20, minZoom:1
+            zoomControl:false, maxZoom:20, minZoom:1
         }).fitBounds([[-26.8712,-52.4130],[-26.8712,-52.4130]]);
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/AlyssonKrombauer/localizador_ru" target="_blank">Alysson Krombauer</a> &middot; <a href="https://ambiental.sc/" title="Ambiental.sc">Ambiental.sc</a> &middot;');
