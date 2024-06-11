@@ -16,9 +16,20 @@
             padding: 0;
             margin: 0;
         }
+        #menu {
+            position: absolute;
+            top: 7%;
+            left: 120px;
+            transform: translate(-50%, -50%);
+            z-index: 1000; /* Certifique-se de que o menu esteja na frente do mapa */
+            background-color: rgba(255, 255, 255, 0.752);
+            padding: 5px;
+            border-radius: 10px;
+            /* height:60px; */
+        }
         #aviso {
             position: absolute;
-            top: 11%;
+            top: 6%;
             left: 16%;
             transform: translate(-50%, -50%);
             z-index: 1000; /* Certifique-se de que o menu esteja na frente do mapa */
@@ -27,6 +38,23 @@
             border-radius: 10px;
             /* height:60px; */
         }
+        #container {
+            top: 22%;
+            position: absolute;
+            z-index: 1000; 
+            padding-left: 10px;
+        }
+
+            #infoDiv2 {
+                position: relative;
+                top: 20%;
+                border-radius: 10px;
+                background-color: rgba(255, 255, 255, 0.752);
+                padding: 10px;
+                padding-left: 10px; /* Espaço inicial da borda esquerda */
+                width: 265px;
+                display: none;
+            }
         @media only screen and (max-width: 600px) {
             #aviso {
                 width: 90%; /* Define a largura como 90% da largura da tela em dispositivos com largura de tela de até 600 pixels */
@@ -40,7 +68,11 @@
         <link rel="shortcut icon" type="image/jpg" href="icon.ico"/>    </head>
     <body>
         <div id="aviso">1 - Pesquise por Rua, N° e Cidade<br>2 - Clique na linha sobre a rua, no local mais próximo à sua pesquisa</div>
+        <div id="container">
+            <div id="infoDiv2"></div>
+        </div>
         <div id="map"></div>
+        </div>        
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/leaflet.rotatedMarker.js"></script>
@@ -274,6 +306,59 @@
         document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
         .title += 'Search for a place';
         setBounds();
+        googleGeocoder.on('markgeocode', function(event) {
+            document.getElementById('infoDiv2').style.display = 'block';
+            document.getElementById("infoDiv2").innerHTML = "";
+
+            // Obtém as coordenadas do endereço pesquisado
+            var latLng = event.geocode.center;
+
+            console.log(event.geocode.center)
+        
+            // Inicializa variáveis para armazenar a coordenada mais próxima, a menor distância e a distância do ponto mais próximo
+            var nearestCoordinate;
+            var shortestDistance = Infinity;
+            var nearestDistance = Infinity;
+            var address = event.geocode.name;
+
+        
+            // Itera sobre todas as coordenadas no arquivo Dissolvido_1.js
+            json_DOMXANXERE_1.features.forEach(function(feature) {
+                var coordinates = feature.geometry.coordinates;
+        
+                // Inicializa a menor distância como infinito para garantir que qualquer outra distância seja menor
+                var featureShortestDistance = Infinity;
+        
+                // Itera sobre todos os pontos da geometria da feature para calcular a distância
+                for (var i = 0; i < coordinates.length; i++) {
+                    for (var j = 0; j < coordinates[i].length; j++) {
+                        var distance = L.latLng(coordinates[i][j][1], coordinates[i][j][0]).distanceTo(latLng);
+        
+                        // Verifica se esta é a menor distância até agora para esta feature
+                        if (distance < featureShortestDistance) {
+                            featureShortestDistance = distance;
+                        }
+                    }
+                }
+        
+                // Verifica se esta é a menor distância entre todas as features
+                if (featureShortestDistance < 500 && featureShortestDistance < shortestDistance) {
+                    shortestDistance = featureShortestDistance;
+                    nearestCoordinate = feature;
+                    nearestDistance = featureShortestDistance;
+                }
+            });
+        
+            // Verifica se encontrou uma coordenada próxima
+            if (nearestCoordinate) {
+                document.getElementById("infoDiv2").innerHTML = 
+                "<b>Logradouro:</b> " + address + "<br>" + "<br>" +
+                "Setor: " + nearestCoordinate.properties.name + "<br>" +
+                "Frequência: " + nearestCoordinate.properties.FREQUENCIA + "<br>" +
+                "Turno: " + nearestCoordinate.properties.TURNO + "<br>" +
+                "Horário: " + nearestCoordinate.properties.HORARIO + "<br>";
+            }
+        });
         </script>
     </body>
 </html>
